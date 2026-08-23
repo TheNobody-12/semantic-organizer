@@ -32,7 +32,7 @@ graph TB
         CMD_DOCTOR["doctor"]
     end
 
-    subgraph EXTRACTION["Extraction Engine (llm.py)"]
+    subgraph EXTRACTION["Extraction Engine (engine.py)"]
         FAST["Fast Method\n(Gemma 2B)"]
         GRAPH["Graph Method\n(Gemma 12B)"]
         AUTO["Auto Method\n(12B + 4B Orchestrator)"]
@@ -50,7 +50,7 @@ graph TB
         NAME["LLM Cluster Naming\n(Gemma 4B)"]
     end
 
-    subgraph RAG["Vectorless GraphRAG (graphrag.py)"]
+    subgraph RAG["Vectorless GraphRAG (rag.py)"]
         INTENT["Intent Extractor"]
         EVIDENCE["Evidence Assembler\n(Graph Traversal)"]
         SYNTH["Synthesis Engine"]
@@ -95,7 +95,7 @@ The root script. Delegates to the Typer CLI app. Also configured as a global ent
 semantic-organizer = "semantic_organizer.cli:app"
 ```
 
-#### [`cli.py`](src/semantic_organizer/cli.py) — 322 lines
+#### `cli.py` — 322 lines
 The command-line interface. Built with [Typer](https://typer.tiangolo.com/) and [Rich](https://rich.readthedocs.io/). Exposes all user-facing commands.
 
 | Command | Description |
@@ -113,7 +113,7 @@ Running Apple MPS PyTorch models inside Python background threads causes silent 
 
 ### 3.2 Configuration
 
-#### [`config.py`](src/semantic_organizer/config.py) — 46 lines
+#### `config.py` — 46 lines
 Manages all runtime configuration via Pydantic models. Loads settings from a YAML file (`semantic-organizer.yaml`) or falls back to sensible defaults.
 
 **Configuration Schema:**
@@ -144,7 +144,7 @@ llm:
 
 ### 3.3 Data Models
 
-#### [`models.py`](src/semantic_organizer/models.py) — 40 lines
+#### `models.py` — 40 lines
 Pydantic data models that define the schema for all extracted information.
 
 | Model | Fields | Purpose |
@@ -160,7 +160,7 @@ Pydantic data models that define the schema for all extracted information.
 
 ### 3.4 Document Extraction
 
-#### [`parser.py`](src/semantic_organizer/parser.py) — 85 lines
+#### `extraction/parser.py` — 85 lines
 Low-level document parsing via IBM's [Docling](https://github.com/DS4SD/docling). Converts PDFs, DOCX, PPTX, XLSX, HTML, and Markdown files into structured Markdown text and semantic chunks.
 
 **Key Functions:**
@@ -168,7 +168,7 @@ Low-level document parsing via IBM's [Docling](https://github.com/DS4SD/docling)
 - `get_converter()` — Initializes a `DocumentConverter` with OCR and table structure detection disabled for speed.
 - `extract_text(file_path)` — Full extraction pipeline: convert → export to Markdown → chunk via `HybridChunker`.
 
-#### [`llm.py`](src/semantic_organizer/llm.py) — 247 lines
+#### `extraction/engine.py` — 247 lines
 The core intelligence engine. Contains three extraction methods and two critical monkey-patches.
 
 **Monkey-Patches (Applied at Module Load):**
@@ -215,7 +215,7 @@ Docling throws a hard exception if you request pages beyond the document's lengt
 
 ### 3.5 Knowledge Graph
 
-#### [`graph.py`](src/semantic_organizer/graph.py) — 95 lines
+#### `graph/store.py` — 95 lines
 Manages the local knowledge graph using [NetworkX](https://networkx.org/). The graph is persisted as a JSON file (`.semantic_graph.json`) using NetworkX's `node_link_data` serialization format.
 
 **Graph Schema:**
@@ -246,7 +246,7 @@ graph LR
 
 ### 3.6 Clustering & Organization
 
-#### [`clustering.py`](src/semantic_organizer/clustering.py) — 108 lines
+#### `graph/clustering.py` — 108 lines
 Implements the semantic clustering pipeline that groups documents into folders.
 
 **Algorithm:**
@@ -263,7 +263,7 @@ Implements the semantic clustering pipeline that groups documents into folders.
 
 ### 3.7 Vectorless GraphRAG
 
-#### [`graphrag.py`](src/semantic_organizer/graphrag.py) — 174 lines
+#### `graph/rag.py` — 174 lines
 A complete Retrieval-Augmented Generation (RAG) system that uses **zero vector embeddings**. Instead of similarity search, it uses LLM-guided graph traversal.
 
 **Architecture — Three-Stage Pipeline:**
@@ -292,15 +292,15 @@ The collected evidence is injected into a grounded generation prompt with strict
 
 ### 3.8 Supporting Modules
 
-#### [`autostructure.py`](src/semantic_organizer/autostructure.py) — 150 lines
+#### `autostructure.py` — 150 lines
 Reads `.semantic.json` sidecar files and asks the LLM to design an optimal folder hierarchy. Supports `--apply` for execution and dry-run preview by default.
 
-#### [`sidecar.py`](src/semantic_organizer/sidecar.py) — 102 lines
+#### `pipeline/sidecar.py` — 102 lines
 Generates two companion files for each organized document:
 - **`.semantic.json`** — Machine-readable metadata (entities, tags, summary, hash).
 - **`.semantic.md`** — Human-readable Markdown with YAML frontmatter, Obsidian WikiLinks, and Dataview queries for integration with [Obsidian](https://obsidian.md/).
 
-#### [`journal.py`](src/semantic_organizer/journal.py) — 132 lines
+#### `pipeline/journal.py` — 132 lines
 An SQLite-backed state machine for crash recovery. Tracks each document through 8 states:
 
 ```
@@ -309,14 +309,14 @@ PLANNED → PARSED → ANALYZED → GRAPH_WRITTEN → COPIED → VERIFIED → AR
 
 If the pipeline crashes mid-run, calling `organize` again will automatically resume from the last completed state via `start_or_resume_run()`.
 
-#### [`routing.py`](src/semantic_organizer/routing.py) — 91 lines
+#### `pipeline/routing.py` — 91 lines
 Handles safe file copy operations with integrity verification:
 1. Copy to a `.tmp` file.
 2. Verify SHA-256 hash matches the original.
 3. Write sidecar artifacts.
 4. Atomic rename `.tmp` → final path.
 
-#### [`restructure.py`](src/semantic_organizer/restructure.py) — 79 lines
+#### `pipeline/rollback.py` — 79 lines
 Contains `OverlapAnalyzer` (finds categories with shared concepts) and `RollbackManager` (creates a JSON manifest of all file moves and can reverse them).
 
 ---
@@ -425,6 +425,12 @@ semantic-organizer sweep --days 180
 
 | Issue | Impact | Planned Fix |
 |---|---|---|
+| **No `.semanticignore`** | Will scan unwanted directories unless filtered out manually. | Implement a `.gitignore`-style exclusion file. |
+| **No `init` command** | No hidden `.semantic/` workspace folder. Graph JSON is visible in the target directory. | Add `semantic-organizer init` to create a hidden workspace, similar to `git init`. |
+| **No global config** | Users must place a YAML config file in the working directory. | Add `~/.config/semantic-organizer/config.yaml` with an interactive setup wizard. |
+| **No upward directory traversal** | The CLI does not auto-discover the nearest `.semantic/` folder by walking up the filesystem tree. | Implement `.git`-style parent directory scanning. |
+| **Single LLM provider assumed** | Hardcoded to `http://localhost:1234/v1` (LM Studio). No support for Ollama or cloud APIs out of the box. | Add an interactive `config` wizard that supports multiple providers. |
+---|---|---|
 | **No `.semanticignore`** | Will scan `node_modules/`, `.git/`, and other unwanted directories. | Implement a `.gitignore`-style exclusion file. |
 | **No `init` command** | No hidden `.semantic/` folder. Graph JSON is visible in the target directory. | Add `semantic-organizer init` to create a hidden workspace, similar to `git init`. |
 | **No global config** | Users must place a YAML config file in the working directory. | Add `~/.config/semantic-organizer/config.yaml` with an interactive setup wizard. |
@@ -462,36 +468,45 @@ semantic-organizer sweep --days 180
 
 ```
 Semantic-Organizer/
-├── main.py                          # Entry point
 ├── pyproject.toml                   # Project metadata, dependencies, entry points
-├── uv.lock                         # Locked dependency versions
+├── uv.lock                          # Locked dependency versions
 ├── README.md                        # Project README
+├── LICENSE                          # MIT License
+├── CONTRIBUTING.md                  # Developer guidelines
+├── CHANGELOG.md                     # Version history
+├── .gitignore                       # Ignored files
+├── .github/                         # GitHub templates and workflows
 │
-├── semantic_organizer/              # Main Python package
+├── src/semantic_organizer/          # Main Python package
 │   ├── __init__.py
-│   ├── cli.py                       # Typer CLI commands (322 lines)
-│   ├── config.py                    # Pydantic configuration loader (46 lines)
-│   ├── models.py                    # Data models (40 lines)
-│   ├── parser.py                    # Docling document parser (85 lines)
-│   ├── llm.py                       # LLM extraction engine (247 lines)
-│   ├── graph.py                     # NetworkX graph manager (95 lines)
-│   ├── clustering.py                # Louvain clustering + LLM naming (108 lines)
-│   ├── graphrag.py                  # Vectorless RAG pipeline (174 lines)
-│   ├── autostructure.py             # LLM-driven folder hierarchy design (150 lines)
-│   ├── sidecar.py                   # .semantic.json/.md artifact writer (102 lines)
-│   ├── journal.py                   # SQLite crash recovery journal (132 lines)
-│   ├── routing.py                   # Safe file copy with hash verification (91 lines)
-│   └── restructure.py               # Overlap analysis and rollback (79 lines)
+│   ├── cli.py                       # Typer CLI commands
+│   ├── config.py                    # Pydantic configuration loader
+│   ├── models.py                    # Data models
+│   │
+│   ├── extraction/                  # Parsing and LLM extraction
+│   │   ├── __init__.py
+│   │   ├── parser.py                # Docling document parser
+│   │   ├── engine.py                # LLM extraction engine
+│   │   └── _patches.py              # Monkey-patches for external libraries
+│   │
+│   ├── graph/                       # Knowledge graph and reasoning
+│   │   ├── __init__.py
+│   │   ├── store.py                 # NetworkX graph manager
+│   │   ├── clustering.py            # Louvain clustering + LLM naming
+│   │   └── rag.py                   # Vectorless RAG pipeline
+│   │
+│   └── pipeline/                    # File operations and state
+│       ├── __init__.py
+│       ├── journal.py               # SQLite crash recovery journal
+│       ├── routing.py               # Safe file copy with hash verification
+│       ├── rollback.py              # Overlap analysis and rollback
+│       └── sidecar.py               # .semantic.json/.md artifact writer
 │
-├── test_docs/                       # Test input documents
-├── test_output/                     # Test organized output
-├── tests/                           # Test suite
-├── docs/                            # Documentation
-└── lib/                             # External libraries
+├── tests/                           # Test suite and fixtures
+└── docs/                            # Documentation
 ```
 
-**Total Codebase:** ~1,741 lines of Python across 14 source files.
-
+**Total Codebase:** ~1,741 lines of Python across 16 source files.
 ---
 
 > *This report was generated for the Semantic Organizer project (v0.1.0). For questions or contributions, contact the author.*
