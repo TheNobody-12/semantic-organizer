@@ -1,0 +1,705 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+                <link href="lib/tom-select/tom-select.css" rel="stylesheet">
+                <script src="lib/tom-select/tom-select.complete.min.js"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 100vh;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 100vh;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+                <div id="select-menu" class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col-10 pb-2">
+                            <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="selectNode([value]);"
+                            id="select-node"
+                            placeholder="Select node..."
+                            >
+                                <option selected>Select a Node by ID</option>
+                                
+                                    <option value="sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05">sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05</option>
+                                
+                                    <option value="folder:test_docs">folder:test_docs</option>
+                                
+                                    <option value="tag:software license">tag:software license</option>
+                                
+                                    <option value="tag:purchase agreement">tag:purchase agreement</option>
+                                
+                                    <option value="tag:oracle">tag:oracle</option>
+                                
+                                    <option value="tag:techsolutions inc.">tag:techsolutions inc.</option>
+                                
+                                    <option value="tag:software procurement">tag:software procurement</option>
+                                
+                                    <option value="tag:microsoft office suite">tag:microsoft office suite</option>
+                                
+                                    <option value="tag:adobe creative cloud">tag:adobe creative cloud</option>
+                                
+                                    <option value="tag:zoom pro subscription">tag:zoom pro subscription</option>
+                                
+                                    <option value="tag:marketing department">tag:marketing department</option>
+                                
+                                    <option value="entity:Person:sarthak kapaliya">entity:Person:sarthak kapaliya</option>
+                                
+                                    <option value="entity:Organization:oracle">entity:Organization:oracle</option>
+                                
+                                    <option value="entity:Organization:techsolutions inc.">entity:Organization:techsolutions inc.</option>
+                                
+                                    <option value="entity:Product:microsoft office suite">entity:Product:microsoft office suite</option>
+                                
+                                    <option value="entity:Product:adobe creative cloud">entity:Product:adobe creative cloud</option>
+                                
+                                    <option value="entity:Product:zoom pro subscription">entity:Product:zoom pro subscription</option>
+                                
+                                    <option value="sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c">sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c</option>
+                                
+                                    <option value="folder:Data">folder:Data</option>
+                                
+                                    <option value="tag:data science">tag:data science</option>
+                                
+                                    <option value="tag:machine learning">tag:machine learning</option>
+                                
+                                    <option value="tag:llm">tag:llm</option>
+                                
+                                    <option value="tag:agentic ai">tag:agentic ai</option>
+                                
+                                    <option value="tag:mlops">tag:mlops</option>
+                                
+                                    <option value="tag:financial services">tag:financial services</option>
+                                
+                                    <option value="tag:azure databricks">tag:azure databricks</option>
+                                
+                                    <option value="tag:predictive modeling">tag:predictive modeling</option>
+                                
+                                    <option value="tag:ai strategy">tag:ai strategy</option>
+                                
+                                    <option value="tag:software engineering">tag:software engineering</option>
+                                
+                                    <option value="entity:Organization:pwc canada">entity:Organization:pwc canada</option>
+                                
+                                    <option value="entity:Organization:mcmaster university">entity:Organization:mcmaster university</option>
+                                
+                                    <option value="entity:Organization:manulife financial">entity:Organization:manulife financial</option>
+                                
+                                    <option value="sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b">sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b</option>
+                                
+                                    <option value="tag:kubernetes">tag:kubernetes</option>
+                                
+                                    <option value="tag:redis">tag:redis</option>
+                                
+                                    <option value="tag:parallel processing">tag:parallel processing</option>
+                                
+                                    <option value="tag:work queue">tag:work queue</option>
+                                
+                                    <option value="tag:docker">tag:docker</option>
+                                
+                                    <option value="tag:job manifest">tag:job manifest</option>
+                                
+                                    <option value="tag:containerization">tag:containerization</option>
+                                
+                                    <option value="entity:Software:redis">entity:Software:redis</option>
+                                
+                                    <option value="entity:Platform:kubernetes">entity:Platform:kubernetes</option>
+                                
+                                    <option value="entity:Organization:docker hub">entity:Organization:docker hub</option>
+                                
+                                    <option value="entity:Software Library:resque">entity:Software Library:resque</option>
+                                
+                                    <option value="sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd">sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd</option>
+                                
+                                    <option value="tag:databricks">tag:databricks</option>
+                                
+                                    <option value="tag:job automation">tag:job automation</option>
+                                
+                                    <option value="tag:cli">tag:cli</option>
+                                
+                                    <option value="tag:sdk">tag:sdk</option>
+                                
+                                    <option value="tag:rest api">tag:rest api</option>
+                                
+                                    <option value="tag:ci/cd">tag:ci/cd</option>
+                                
+                                    <option value="tag:job management">tag:job management</option>
+                                
+                                    <option value="tag:infrastructure as code">tag:infrastructure as code</option>
+                                
+                                    <option value="entity:Organization:databricks">entity:Organization:databricks</option>
+                                
+                                    <option value="entity:Tool:databricks cli">entity:Tool:databricks cli</option>
+                                
+                                    <option value="entity:Software:databricks sdks">entity:Software:databricks sdks</option>
+                                
+                                    <option value="entity:API:databricks rest api">entity:API:databricks rest api</option>
+                                
+                                    <option value="entity:Product:databricks asset bundles">entity:Product:databricks asset bundles</option>
+                                
+                                    <option value="entity:Software:terraform">entity:Software:terraform</option>
+                                
+                                    <option value="sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9">sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9</option>
+                                
+                                    <option value="tag:jobs">tag:jobs</option>
+                                
+                                    <option value="tag:cronjobs">tag:cronjobs</option>
+                                
+                                    <option value="tag:platform engineering">tag:platform engineering</option>
+                                
+                                    <option value="tag:batch processing">tag:batch processing</option>
+                                
+                                    <option value="tag:infrastructure management">tag:infrastructure management</option>
+                                
+                                    <option value="tag:monitoring">tag:monitoring</option>
+                                
+                                    <option value="tag:security">tag:security</option>
+                                
+                                    <option value="tag:rbac">tag:rbac</option>
+                                
+                                    <option value="tag:cron syntax">tag:cron syntax</option>
+                                
+                                    <option value="tag:etl">tag:etl</option>
+                                
+                                    <option value="entity:Monitoring Tool:prometheus">entity:Monitoring Tool:prometheus</option>
+                                
+                                    <option value="entity:Machine Learning Framework:tensorflow">entity:Machine Learning Framework:tensorflow</option>
+                                
+                                    <option value="entity:Database:postgresql">entity:Database:postgresql</option>
+                                
+                                    <option value="sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119">sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119</option>
+                                
+                                    <option value="tag:artificial intelligence">tag:artificial intelligence</option>
+                                
+                                    <option value="tag:digital health">tag:digital health</option>
+                                
+                                    <option value="tag:remote patient monitoring">tag:remote patient monitoring</option>
+                                
+                                    <option value="tag:data engineering">tag:data engineering</option>
+                                
+                                    <option value="tag:research assistant">tag:research assistant</option>
+                                
+                                    <option value="tag:healthcare innovation">tag:healthcare innovation</option>
+                                
+                                    <option value="tag:python">tag:python</option>
+                                
+                                    <option value="tag:sql">tag:sql</option>
+                                
+                                    <option value="tag:pyspark">tag:pyspark</option>
+                                
+                                    <option value="tag:databrics">tag:databrics</option>
+                                
+                                    <option value="tag:etl pipelines">tag:etl pipelines</option>
+                                
+                                    <option value="entity:Organization:hamilton health sciences">entity:Organization:hamilton health sciences</option>
+                                
+                                    <option value="entity:Organization:create">entity:Organization:create</option>
+                                
+                                    <option value="sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08">sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08</option>
+                                
+                                    <option value="tag:compiler optimization">tag:compiler optimization</option>
+                                
+                                    <option value="tag:programming languages">tag:programming languages</option>
+                                
+                                    <option value="tag:procedure integration">tag:procedure integration</option>
+                                
+                                    <option value="tag:computer architecture">tag:computer architecture</option>
+                                
+                                    <option value="entity:Person:frances e. allen">entity:Person:frances e. allen</option>
+                                
+                                    <option value="entity:Person:john cocke">entity:Person:john cocke</option>
+                                
+                                    <option value="entity:Organization:ibm thomas j. watson research center">entity:Organization:ibm thomas j. watson research center</option>
+                                
+                                    <option value="sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238">sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238</option>
+                                
+                                    <option value="tag:patricia trie">tag:patricia trie</option>
+                                
+                                    <option value="tag:restricted transactional memory (rtm)">tag:restricted transactional memory (rtm)</option>
+                                
+                                    <option value="tag:hardware transactional memory (htm)">tag:hardware transactional memory (htm)</option>
+                                
+                                    <option value="tag:concurrent data structures">tag:concurrent data structures</option>
+                                
+                                    <option value="tag:lock teleportation">tag:lock teleportation</option>
+                                
+                                    <option value="tag:parallelism">tag:parallelism</option>
+                                
+                                    <option value="tag:memory management">tag:memory management</option>
+                                
+                                    <option value="entity:Organization:brown university">entity:Organization:brown university</option>
+                                
+                                    <option value="entity:Organization:intel">entity:Organization:intel</option>
+                                
+                                    <option value="entity:Hardware System:ibm blue gene/q">entity:Hardware System:ibm blue gene/q</option>
+                                
+                                    <option value="entity:Hardware System:system z">entity:Hardware System:system z</option>
+                                
+                                    <option value="sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c">sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c</option>
+                                
+                                    <option value="tag:independent auditor's report">tag:independent auditor's report</option>
+                                
+                                    <option value="tag:financial statements">tag:financial statements</option>
+                                
+                                    <option value="tag:audit">tag:audit</option>
+                                
+                                    <option value="tag:city of toronto">tag:city of toronto</option>
+                                
+                                    <option value="tag:kpmg llp">tag:kpmg llp</option>
+                                
+                                    <option value="tag:consolidated trust funds">tag:consolidated trust funds</option>
+                                
+                                    <option value="tag:financial position">tag:financial position</option>
+                                
+                                    <option value="tag:accounting standards">tag:accounting standards</option>
+                                
+                                    <option value="entity:Organization:city of toronto">entity:Organization:city of toronto</option>
+                                
+                                    <option value="entity:Organization:kpmg llp">entity:Organization:kpmg llp</option>
+                                
+                                    <option value="entity:Organization:kpmg international limited">entity:Organization:kpmg international limited</option>
+                                
+                                    <option value="sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a">sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a</option>
+                                
+                                    <option value="tag:ai engineering">tag:ai engineering</option>
+                                
+                                    <option value="tag:multi-agent orchestration">tag:multi-agent orchestration</option>
+                                
+                                    <option value="tag:rag">tag:rag</option>
+                                
+                                    <option value="tag:machine learning evaluation">tag:machine learning evaluation</option>
+                                
+                                    <option value="tag:langgraph">tag:langgraph</option>
+                                
+                                    <option value="tag:model context protocol (mcp)">tag:model context protocol (mcp)</option>
+                                
+                                    <option value="tag:azure openai">tag:azure openai</option>
+                                
+                                    <option value="tag:mlflow">tag:mlflow</option>
+                                
+                                    <option value="entity:Person:sarthak naitik kapaliya">entity:Person:sarthak naitik kapaliya</option>
+                                
+                                    <option value="entity:Organization:zafin">entity:Organization:zafin</option>
+                                
+                                    <option value="entity:Location:toronto">entity:Location:toronto</option>
+                                
+                                    <option value="sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9">sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9</option>
+                                
+                                    <option value="tag:relational model">tag:relational model</option>
+                                
+                                    <option value="tag:data independence">tag:data independence</option>
+                                
+                                    <option value="tag:database systems">tag:database systems</option>
+                                
+                                    <option value="tag:n-ary relations">tag:n-ary relations</option>
+                                
+                                    <option value="tag:data integrity">tag:data integrity</option>
+                                
+                                    <option value="tag:relational algebra">tag:relational algebra</option>
+                                
+                                    <option value="tag:database theory">tag:database theory</option>
+                                
+                                    <option value="entity:Organization:ibm research laboratory">entity:Organization:ibm research laboratory</option>
+                                
+                                    <option value="entity:Person:e. f. codd">entity:Person:e. f. codd</option>
+                                
+                                    <option value="sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca">sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca</option>
+                                
+                                    <option value="tag:annual financial report">tag:annual financial report</option>
+                                
+                                    <option value="tag:public finance">tag:public finance</option>
+                                
+                                    <option value="tag:urban planning">tag:urban planning</option>
+                                
+                                    <option value="tag:housing development">tag:housing development</option>
+                                
+                                    <option value="tag:climate action">tag:climate action</option>
+                                
+                                    <option value="tag:infrastructure">tag:infrastructure</option>
+                                
+                                    <option value="tag:credit rating">tag:credit rating</option>
+                                
+                                    <option value="tag:municipal government">tag:municipal government</option>
+                                
+                                    <option value="entity:Organization:s&p global">entity:Organization:s&p global</option>
+                                
+                                    <option value="entity:Government:government of ontario">entity:Government:government of ontario</option>
+                                
+                                    <option value="entity:Government:federal government">entity:Government:federal government</option>
+                                
+                                    <option value="entity:Person:olivia chow">entity:Person:olivia chow</option>
+                                
+                                    <option value="entity:Person:paul johnson">entity:Person:paul johnson</option>
+                                
+                                    <option value="entity:Organization:toronto community housing corporation">entity:Organization:toronto community housing corporation</option>
+                                
+                                    <option value="sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798">sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798</option>
+                                
+                                    <option value="tag:trust funds">tag:trust funds</option>
+                                
+                                    <option value="tag:asset management">tag:asset management</option>
+                                
+                                    <option value="tag:cash flow analysis">tag:cash flow analysis</option>
+                                
+                                    <option value="tag:annual report">tag:annual report</option>
+                                
+                                    <option value="tag:investment income">tag:investment income</option>
+                                
+                                    <option value="entity:Organization:kpmg">entity:Organization:kpmg</option>
+                                
+                                    <option value="sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39">sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39</option>
+                                
+                                    <option value="tag:job monitoring">tag:job monitoring</option>
+                                
+                                    <option value="tag:container orchestration">tag:container orchestration</option>
+                                
+                                    <option value="tag:kubectl">tag:kubectl</option>
+                                
+                                    <option value="tag:minikube">tag:minikube</option>
+                                
+                                    <option value="tag:log analysis">tag:log analysis</option>
+                                
+                                    <option value="entity:Tool:minikube">entity:Tool:minikube</option>
+                                
+                                    <option value="sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957">sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957</option>
+                                
+                                    <option value="tag:public sector accounting">tag:public sector accounting</option>
+                                
+                                    <option value="tag:audit report">tag:audit report</option>
+                                
+                                    <option value="tag:net debt">tag:net debt</option>
+                                
+                                    <option value="tag:corporate finance">tag:corporate finance</option>
+                                
+                                    <option value="tag:consolidated statement of operations">tag:consolidated statement of operations</option>
+                                
+                                    <option value="tag:revenue">tag:revenue</option>
+                                
+                                    <option value="tag:capital assets">tag:capital assets</option>
+                                
+                                    <option value="tag:remeasurement gains">tag:remeasurement gains</option>
+                                
+                                    <option value="tag:government transfers">tag:government transfers</option>
+                                
+                                    <option value="tag:operating surplus">tag:operating surplus</option>
+                                
+                                    <option value="entity:Person:jason li">entity:Person:jason li</option>
+                                
+                                    <option value="entity:Person:stephen conforti">entity:Person:stephen conforti</option>
+                                
+                                    <option value="sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b">sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b</option>
+                                
+                                    <option value="tag:azure">tag:azure</option>
+                                
+                                    <option value="tag:aws">tag:aws</option>
+                                
+                                    <option value="tag:pytorch">tag:pytorch</option>
+                                
+                                    <option value="tag:cloud computing">tag:cloud computing</option>
+                                
+                                    <option value="entity:Organization:buze platforms private limited">entity:Organization:buze platforms private limited</option>
+                                
+                                    <option value="entity:Education Institution:mcmaster university">entity:Education Institution:mcmaster university</option>
+                                
+                                    <option value="entity:Education Institution:pandit deendayal energy university">entity:Education Institution:pandit deendayal energy university</option>
+                                
+                                    <option value="sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93">sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93</option>
+                                
+                                    <option value="tag:k8s">tag:k8s</option>
+                                
+                                    <option value="tag:distributed systems">tag:distributed systems</option>
+                                
+                                    <option value="entity:Software:kubernetes">entity:Software:kubernetes</option>
+                                
+                                    <option value="entity:Organization:google">entity:Organization:google</option>
+                                
+                                    <option value="entity:System:borg">entity:System:borg</option>
+                                
+                                    <option value="entity:System:omega">entity:System:omega</option>
+                                
+                                    <option value="sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251">sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251</option>
+                                
+                                    <option value="tag:generative ai">tag:generative ai</option>
+                                
+                                    <option value="entity:Organization:pandit deendayal energy university">entity:Organization:pandit deendayal energy university</option>
+                                
+                                    <option value="entity:Organization:anthropic">entity:Organization:anthropic</option>
+                                
+                                    <option value="sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139">sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139</option>
+                                
+                                    <option value="tag:canadian public sector accounting standards">tag:canadian public sector accounting standards</option>
+                                
+                                    <option value="tag:financial reporting">tag:financial reporting</option>
+                                
+                                    <option value="tag:internal controls">tag:internal controls</option>
+                                
+                                    <option value="tag:audit opinion">tag:audit opinion</option>
+                                
+                                    <option value="entity:Organization:public sector accounting board of the chartered professional accountants of canada">entity:Organization:public sector accounting board of the chartered professional accountants of canada</option>
+                                
+                                    <option value="sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb">sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb</option>
+                                
+                                    <option value="tag:financial audit">tag:financial audit</option>
+                                
+                                    <option value="tag:sinking funds">tag:sinking funds</option>
+                                
+                                    <option value="entity:Organization:city of toronto sinking funds">entity:Organization:city of toronto sinking funds</option>
+                                
+                                    <option value="sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd">sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd</option>
+                                
+                                    <option value="tag:hpa">tag:hpa</option>
+                                
+                                    <option value="tag:vpa">tag:vpa</option>
+                                
+                                    <option value="tag:autoscaling">tag:autoscaling</option>
+                                
+                                    <option value="tag:metrics server">tag:metrics server</option>
+                                
+                                    <option value="tag:resource optimization">tag:resource optimization</option>
+                                
+                                    <option value="entity:Feature:horizontal pod autoscaling (hpa)">entity:Feature:horizontal pod autoscaling (hpa)</option>
+                                
+                                    <option value="entity:Feature:vertical pod autoscaling (vpa)">entity:Feature:vertical pod autoscaling (vpa)</option>
+                                
+                                    <option value="entity:Component:metrics server">entity:Component:metrics server</option>
+                                
+                                    <option value="entity:Software:nginx">entity:Software:nginx</option>
+                                
+                                    <option value="entity:Tool:stress-ng">entity:Tool:stress-ng</option>
+                                
+                                    <option value="sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e">sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e</option>
+                                
+                                    <option value="tag:actuarial requirements">tag:actuarial requirements</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-2 pb-2">
+                            <button type="button" class="btn btn-primary btn-block" onclick="neighbourhoodHighlight({nodes: []});">Reset Selection</button>
+                        </div>
+                    </div>
+                </div>
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+                  new TomSelect("#select-node",{
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      }
+                  });
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "label": "contract.txt", "shape": "dot", "title": "Type: Document"}, {"color": "#feca57", "font": {"color": "white"}, "id": "folder:test_docs", "label": "test_docs", "shape": "dot", "title": "Type: Folder"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:software license", "label": "#Software License", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:purchase agreement", "label": "#Purchase Agreement", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:oracle", "label": "#Oracle", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:techsolutions inc.", "label": "#TechSolutions Inc.", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:software procurement", "label": "#Software Procurement", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:microsoft office suite", "label": "#Microsoft Office Suite", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:adobe creative cloud", "label": "#Adobe Creative Cloud", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:zoom pro subscription", "label": "#Zoom Pro Subscription", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:marketing department", "label": "#Marketing Department", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:sarthak kapaliya", "label": "Sarthak Kapaliya", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:oracle", "label": "Oracle", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:techsolutions inc.", "label": "TechSolutions Inc.", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Product:microsoft office suite", "label": "Microsoft Office Suite", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Product:adobe creative cloud", "label": "Adobe Creative Cloud", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Product:zoom pro subscription", "label": "Zoom Pro Subscription", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "label": "Sarthak_Kapaliya_PwC_Cover_Letter.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#feca57", "font": {"color": "white"}, "id": "folder:Data", "label": "Data", "shape": "dot", "title": "Type: Folder"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:data science", "label": "#Data Science", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:machine learning", "label": "#Machine Learning", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:llm", "label": "#LLM", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:agentic ai", "label": "#Agentic AI", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:mlops", "label": "#MLOps", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:financial services", "label": "#Financial Services", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:azure databricks", "label": "#Azure Databricks", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:predictive modeling", "label": "#Predictive Modeling", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:ai strategy", "label": "#AI Strategy", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:software engineering", "label": "#Software Engineering", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:pwc canada", "label": "PwC Canada", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:mcmaster university", "label": "McMaster University", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:manulife financial", "label": "Manulife Financial", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "label": "parallel_work_queue.txt", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:kubernetes", "label": "#Kubernetes", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:redis", "label": "#Redis", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:parallel processing", "label": "#Parallel Processing", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:work queue", "label": "#Work Queue", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:docker", "label": "#Docker", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:job manifest", "label": "#Job Manifest", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:containerization", "label": "#Containerization", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Software:redis", "label": "Redis", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Platform:kubernetes", "label": "Kubernetes", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:docker hub", "label": "Docker Hub", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Software Library:resque", "label": "Resque", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "label": "job_management.html", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:databricks", "label": "#Databricks", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:job automation", "label": "#Job Automation", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:cli", "label": "#CLI", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:sdk", "label": "#SDK", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:rest api", "label": "#REST API", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:ci/cd", "label": "#CI/CD", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:job management", "label": "#Job Management", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:infrastructure as code", "label": "#Infrastructure as Code", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:databricks", "label": "Databricks", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Tool:databricks cli", "label": "Databricks CLI", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Software:databricks sdks", "label": "Databricks SDKs", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:API:databricks rest api", "label": "Databricks REST API", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Product:databricks asset bundles", "label": "Databricks Asset Bundles", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Software:terraform", "label": "Terraform", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "label": "cronjobs.docx", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:jobs", "label": "#Jobs", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:cronjobs", "label": "#CronJobs", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:platform engineering", "label": "#Platform Engineering", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:batch processing", "label": "#Batch Processing", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:infrastructure management", "label": "#Infrastructure Management", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:monitoring", "label": "#Monitoring", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:security", "label": "#Security", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:rbac", "label": "#RBAC", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:cron syntax", "label": "#Cron Syntax", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:etl", "label": "#ETL", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Monitoring Tool:prometheus", "label": "Prometheus", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Machine Learning Framework:tensorflow", "label": "TensorFlow", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Database:postgresql", "label": "PostgreSQL", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "label": "Sarthak_Kapaliya_Cover_Letter_HHS_CREATE.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:artificial intelligence", "label": "#Artificial Intelligence", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:digital health", "label": "#Digital Health", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:remote patient monitoring", "label": "#Remote Patient Monitoring", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:data engineering", "label": "#Data Engineering", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:research assistant", "label": "#Research Assistant", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:healthcare innovation", "label": "#Healthcare Innovation", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:python", "label": "#Python", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:sql", "label": "#SQL", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:pyspark", "label": "#PySpark", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:databrics", "label": "#Databrics", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:etl pipelines", "label": "#ETL Pipelines", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:hamilton health sciences", "label": "Hamilton Health Sciences", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:create", "label": "CREATE", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "label": "A Catalogue of Optimizing Transformations (1971-allen-catalog).pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:compiler optimization", "label": "#Compiler Optimization", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:programming languages", "label": "#Programming Languages", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:procedure integration", "label": "#Procedure Integration", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:computer architecture", "label": "#Computer Architecture", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:frances e. allen", "label": "Frances E. Allen", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:john cocke", "label": "John Cocke", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:ibm thomas j. watson research center", "label": "IBM Thomas J. Watson Research Center", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "label": "A Case Study in Optimizing HTM-Enabled Dynamic Data Structures - Patricia Tries (2015).pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:patricia trie", "label": "#Patricia trie", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:restricted transactional memory (rtm)", "label": "#Restricted Transactional Memory (RTM)", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:hardware transactional memory (htm)", "label": "#Hardware Transactional Memory (HTM)", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:concurrent data structures", "label": "#Concurrent Data Structures", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:lock teleportation", "label": "#Lock Teleportation", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:parallelism", "label": "#Parallelism", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:memory management", "label": "#Memory Management", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:brown university", "label": "Brown University", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:intel", "label": "Intel", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Hardware System:ibm blue gene/q", "label": "IBM Blue Gene/Q", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Hardware System:system z", "label": "System z", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "label": "988a-2024-Trust-Fund-Statements-07-28-2025.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:independent auditor\u0027s report", "label": "#Independent Auditor\u0027s Report", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:financial statements", "label": "#Financial Statements", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:audit", "label": "#Audit", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:city of toronto", "label": "#City of Toronto", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:kpmg llp", "label": "#KPMG LLP", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:consolidated trust funds", "label": "#Consolidated Trust Funds", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:financial position", "label": "#Financial Position", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:accounting standards", "label": "#Accounting Standards", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:city of toronto", "label": "City of Toronto", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:kpmg llp", "label": "KPMG LLP", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:kpmg international limited", "label": "KPMG International Limited", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "label": "Letter.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:ai engineering", "label": "#AI Engineering", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:multi-agent orchestration", "label": "#Multi-agent Orchestration", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:rag", "label": "#RAG", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:machine learning evaluation", "label": "#Machine Learning Evaluation", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:langgraph", "label": "#LangGraph", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:model context protocol (mcp)", "label": "#Model Context Protocol (MCP)", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:azure openai", "label": "#Azure OpenAI", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:mlflow", "label": "#MLflow", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:sarthak naitik kapaliya", "label": "Sarthak Naitik Kapaliya", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:zafin", "label": "Zafin", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Location:toronto", "label": "Toronto", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "label": "A Relational Model of Data for Large Shared Data Banks - E.F. Codd (1970).pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:relational model", "label": "#Relational Model", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:data independence", "label": "#Data Independence", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:database systems", "label": "#Database Systems", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:n-ary relations", "label": "#N-ary Relations", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:data integrity", "label": "#Data Integrity", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:relational algebra", "label": "#Relational Algebra", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:database theory", "label": "#Database Theory", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:ibm research laboratory", "label": "IBM Research Laboratory", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:e. f. codd", "label": "E. F. CoDD", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "label": "9515-2024-City-of-Toronto-Financial-Report.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:annual financial report", "label": "#Annual Financial Report", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:public finance", "label": "#Public Finance", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:urban planning", "label": "#Urban Planning", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:housing development", "label": "#Housing Development", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:climate action", "label": "#Climate Action", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:infrastructure", "label": "#Infrastructure", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:credit rating", "label": "#Credit Rating", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:municipal government", "label": "#Municipal Government", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:s\u0026p global", "label": "S\u0026P Global", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Government:government of ontario", "label": "Government of Ontario", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Government:federal government", "label": "Federal Government", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:olivia chow", "label": "Olivia Chow", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:paul johnson", "label": "Paul Johnson", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:toronto community housing corporation", "label": "Toronto Community Housing Corporation", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "label": "914a-2025-DRAFT-Trust-Funds-Financial-Statements.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:trust funds", "label": "#Trust Funds", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:asset management", "label": "#Asset Management", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:cash flow analysis", "label": "#Cash Flow Analysis", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:annual report", "label": "#Annual Report", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:investment income", "label": "#Investment Income", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:kpmg", "label": "KPMG", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "label": "monitor_job.docx", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:job monitoring", "label": "#Job Monitoring", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:container orchestration", "label": "#Container Orchestration", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:kubectl", "label": "#kubectl", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:minikube", "label": "#Minikube", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:log analysis", "label": "#Log Analysis", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Tool:minikube", "label": "Minikube", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "label": "98e5-2025-DRAFT-Consolidated-Financial-Statements.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:public sector accounting", "label": "#Public Sector Accounting", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:audit report", "label": "#Audit Report", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:net debt", "label": "#Net Debt", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:corporate finance", "label": "#Corporate Finance", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:consolidated statement of operations", "label": "#Consolidated Statement of Operations", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:revenue", "label": "#Revenue", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:capital assets", "label": "#Capital Assets", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:remeasurement gains", "label": "#Remeasurement Gains", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:government transfers", "label": "#Government Transfers", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:operating surplus", "label": "#Operating Surplus", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:jason li", "label": "Jason Li", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Person:stephen conforti", "label": "Stephen Conforti", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "label": "Sarthak_Kapaliya_Resume.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:azure", "label": "#Azure", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:aws", "label": "#AWS", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:pytorch", "label": "#PyTorch", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:cloud computing", "label": "#Cloud Computing", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:buze platforms private limited", "label": "Buze Platforms Private Limited", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Education Institution:mcmaster university", "label": "McMaster University", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Education Institution:pandit deendayal energy university", "label": "Pandit Deendayal Energy University", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "label": "architecture.pptx", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:k8s", "label": "#K8s", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:distributed systems", "label": "#Distributed Systems", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Software:kubernetes", "label": "Kubernetes", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:google", "label": "Google", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:System:borg", "label": "Borg", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:System:omega", "label": "Omega", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251", "label": "Sarthak_Kapaliya_2026_Agent_Engineer.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:generative ai", "label": "#Generative AI", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:pandit deendayal energy university", "label": "Pandit Deendayal Energy University", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:anthropic", "label": "Anthropic", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139", "label": "2024-Consolidated-FS.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:canadian public sector accounting standards", "label": "#Canadian Public Sector Accounting Standards", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:financial reporting", "label": "#Financial Reporting", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:internal controls", "label": "#Internal Controls", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:audit opinion", "label": "#Audit Opinion", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:public sector accounting board of the chartered professional accountants of canada", "label": "Public Sector Accounting Board of the Chartered Professional Accountants of Canada", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb", "label": "985a-2024-Sinking-Fund-Statements-07-28-2025.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:financial audit", "label": "#Financial Audit", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:sinking funds", "label": "#Sinking Funds", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Organization:city of toronto sinking funds", "label": "City of Toronto Sinking Funds", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "label": "pods_autoscale.html", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:hpa", "label": "#HPA", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:vpa", "label": "#VPA", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:autoscaling", "label": "#Autoscaling", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:metrics server", "label": "#Metrics Server", "shape": "dot", "title": "Type: Tag"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:resource optimization", "label": "#Resource Optimization", "shape": "dot", "title": "Type: Tag"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Feature:horizontal pod autoscaling (hpa)", "label": "Horizontal Pod Autoscaling (HPA)", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Feature:vertical pod autoscaling (vpa)", "label": "Vertical Pod Autoscaling (VPA)", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Component:metrics server", "label": "Metrics Server", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Software:nginx", "label": "Nginx", "shape": "dot", "title": "Type: Entity"}, {"color": "#c8d6e5", "font": {"color": "white"}, "id": "entity:Tool:stress-ng", "label": "stress-ng", "shape": "dot", "title": "Type: Entity"}, {"color": "#ff6b6b", "font": {"color": "white"}, "id": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e", "label": "98df-2025-DRAFT-Sinking-Funds-Financial-Statements.pdf", "shape": "dot", "title": "Type: Document"}, {"color": "#1dd1a1", "font": {"color": "white"}, "id": "tag:actuarial requirements", "label": "#Actuarial Requirements", "shape": "dot", "title": "Type: Tag"}]);
+                  edges = new vis.DataSet([{"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "LOCATED_IN", "to": "folder:test_docs"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:software license"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:purchase agreement"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:oracle"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:techsolutions inc."}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:software procurement"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:microsoft office suite"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:adobe creative cloud"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:zoom pro subscription"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "TAGGED_AS", "to": "tag:marketing department"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "MENTIONS", "to": "entity:Person:sarthak kapaliya"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "MENTIONS", "to": "entity:Organization:oracle"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "MENTIONS", "to": "entity:Organization:techsolutions inc."}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "MENTIONS", "to": "entity:Product:microsoft office suite"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "MENTIONS", "to": "entity:Product:adobe creative cloud"}, {"from": "sha256:da05e62ee6961f322b8ae7157b9d1117eb005439e7dee9fb70859196619f8b05", "title": "MENTIONS", "to": "entity:Product:zoom pro subscription"}, {"from": "entity:Person:sarthak kapaliya", "title": "MENTIONS", "to": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c"}, {"from": "entity:Person:sarthak kapaliya", "title": "MENTIONS", "to": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "LOCATED_IN", "to": "folder:Data"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:data science"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:machine learning"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:llm"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:agentic ai"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:mlops"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:financial services"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:azure databricks"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:predictive modeling"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:ai strategy"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "TAGGED_AS", "to": "tag:software engineering"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "MENTIONS", "to": "entity:Organization:pwc canada"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "MENTIONS", "to": "entity:Organization:mcmaster university"}, {"from": "sha256:8bdfaf94f136ed89592e1c7338895d9d96eee2876416ff670be6bbead81c365c", "title": "MENTIONS", "to": "entity:Organization:manulife financial"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd"}, {"from": "folder:Data", "title": "LOCATED_IN", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "tag:data science", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:data science", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:machine learning", "title": "TAGGED_AS", "to": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9"}, {"from": "tag:machine learning", "title": "TAGGED_AS", "to": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119"}, {"from": "tag:machine learning", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:machine learning", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:llm", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:mlops", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:mlops", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:financial services", "title": "TAGGED_AS", "to": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a"}, {"from": "tag:predictive modeling", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:software engineering", "title": "TAGGED_AS", "to": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08"}, {"from": "tag:software engineering", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "entity:Organization:mcmaster university", "title": "MENTIONS", "to": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119"}, {"from": "entity:Organization:mcmaster university", "title": "MENTIONS", "to": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a"}, {"from": "entity:Organization:mcmaster university", "title": "MENTIONS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "entity:Organization:manulife financial", "title": "MENTIONS", "to": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119"}, {"from": "entity:Organization:manulife financial", "title": "MENTIONS", "to": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a"}, {"from": "entity:Organization:manulife financial", "title": "MENTIONS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "entity:Organization:manulife financial", "title": "MENTIONS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:kubernetes"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:redis"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:parallel processing"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:work queue"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:docker"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:job manifest"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "TAGGED_AS", "to": "tag:containerization"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "MENTIONS", "to": "entity:Software:redis"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "MENTIONS", "to": "entity:Platform:kubernetes"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "MENTIONS", "to": "entity:Organization:docker hub"}, {"from": "sha256:1d2934392a49b132d5f3bb44eee179464f1ee1bb1ac91771a3af0ffd962bff5b", "title": "MENTIONS", "to": "entity:Software Library:resque"}, {"from": "tag:kubernetes", "title": "TAGGED_AS", "to": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9"}, {"from": "tag:kubernetes", "title": "TAGGED_AS", "to": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39"}, {"from": "tag:kubernetes", "title": "TAGGED_AS", "to": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93"}, {"from": "tag:kubernetes", "title": "TAGGED_AS", "to": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd"}, {"from": "entity:Platform:kubernetes", "title": "MENTIONS", "to": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9"}, {"from": "entity:Platform:kubernetes", "title": "MENTIONS", "to": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39"}, {"from": "entity:Platform:kubernetes", "title": "MENTIONS", "to": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:databricks"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:job automation"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:cli"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:sdk"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:rest api"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:ci/cd"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:job management"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "TAGGED_AS", "to": "tag:infrastructure as code"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "MENTIONS", "to": "entity:Organization:databricks"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "MENTIONS", "to": "entity:Tool:databricks cli"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "MENTIONS", "to": "entity:Software:databricks sdks"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "MENTIONS", "to": "entity:API:databricks rest api"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "MENTIONS", "to": "entity:Product:databricks asset bundles"}, {"from": "sha256:c638a0bc3b424362d4429749c0cdb16a885597096eba408119d2b75c8f5076dd", "title": "MENTIONS", "to": "entity:Software:terraform"}, {"from": "tag:databricks", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:databricks", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:jobs"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:cronjobs"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:platform engineering"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:batch processing"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:infrastructure management"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:monitoring"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:security"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:rbac"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:cron syntax"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "TAGGED_AS", "to": "tag:etl"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "MENTIONS", "to": "entity:Monitoring Tool:prometheus"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "MENTIONS", "to": "entity:Machine Learning Framework:tensorflow"}, {"from": "sha256:21a1ac5bbd78b29632c46d1f94a421367c9b7e7f06586373f017b334acb6b1a9", "title": "MENTIONS", "to": "entity:Database:postgresql"}, {"from": "tag:cronjobs", "title": "TAGGED_AS", "to": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39"}, {"from": "tag:batch processing", "title": "TAGGED_AS", "to": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:artificial intelligence"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:digital health"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:remote patient monitoring"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:data engineering"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:research assistant"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:healthcare innovation"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:python"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:sql"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:pyspark"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:databrics"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "TAGGED_AS", "to": "tag:etl pipelines"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "MENTIONS", "to": "entity:Organization:hamilton health sciences"}, {"from": "sha256:ac66daa08e6732f11ce5fbefc4083d1aa78f1b03c172ecaa14cf3f555fc58119", "title": "MENTIONS", "to": "entity:Organization:create"}, {"from": "tag:data engineering", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:python", "title": "TAGGED_AS", "to": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a"}, {"from": "tag:python", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:python", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "TAGGED_AS", "to": "tag:compiler optimization"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "TAGGED_AS", "to": "tag:programming languages"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "TAGGED_AS", "to": "tag:procedure integration"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "TAGGED_AS", "to": "tag:computer architecture"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "MENTIONS", "to": "entity:Person:frances e. allen"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "MENTIONS", "to": "entity:Person:john cocke"}, {"from": "sha256:3a0661795d608b0e409c807416edb024862abe6a5fbba0e704ebb7b13ec22d08", "title": "MENTIONS", "to": "entity:Organization:ibm thomas j. watson research center"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:patricia trie"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:restricted transactional memory (rtm)"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:hardware transactional memory (htm)"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:concurrent data structures"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:lock teleportation"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:parallelism"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "TAGGED_AS", "to": "tag:memory management"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "MENTIONS", "to": "entity:Organization:brown university"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "MENTIONS", "to": "entity:Organization:intel"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "MENTIONS", "to": "entity:Hardware System:ibm blue gene/q"}, {"from": "sha256:0dcfd7d788fa853be8274df8158570f9552c5c803e256ecab3b4f1fa32032238", "title": "MENTIONS", "to": "entity:Hardware System:system z"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:independent auditor\u0027s report"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:financial statements"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:audit"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:city of toronto"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:kpmg llp"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:consolidated trust funds"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:financial position"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "TAGGED_AS", "to": "tag:accounting standards"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "MENTIONS", "to": "entity:Organization:city of toronto"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "MENTIONS", "to": "entity:Organization:kpmg llp"}, {"from": "sha256:8df4acdb09c01ad9b23017a4f7211b4f6163ed1bf67384d653db2213c484178c", "title": "MENTIONS", "to": "entity:Organization:kpmg international limited"}, {"from": "tag:independent auditor\u0027s report", "title": "TAGGED_AS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "tag:financial statements", "title": "TAGGED_AS", "to": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798"}, {"from": "tag:financial statements", "title": "TAGGED_AS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "tag:financial statements", "title": "TAGGED_AS", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "tag:financial statements", "title": "TAGGED_AS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "tag:financial statements", "title": "TAGGED_AS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "tag:city of toronto", "title": "TAGGED_AS", "to": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca"}, {"from": "tag:city of toronto", "title": "TAGGED_AS", "to": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798"}, {"from": "tag:city of toronto", "title": "TAGGED_AS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "tag:city of toronto", "title": "TAGGED_AS", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "tag:city of toronto", "title": "TAGGED_AS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "tag:city of toronto", "title": "TAGGED_AS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "tag:kpmg llp", "title": "TAGGED_AS", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "tag:kpmg llp", "title": "TAGGED_AS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "tag:accounting standards", "title": "TAGGED_AS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "entity:Organization:city of toronto", "title": "MENTIONS", "to": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca"}, {"from": "entity:Organization:city of toronto", "title": "MENTIONS", "to": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798"}, {"from": "entity:Organization:city of toronto", "title": "MENTIONS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "entity:Organization:city of toronto", "title": "MENTIONS", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "entity:Organization:city of toronto", "title": "MENTIONS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "entity:Organization:city of toronto", "title": "MENTIONS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "entity:Organization:kpmg llp", "title": "MENTIONS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "entity:Organization:kpmg llp", "title": "MENTIONS", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "entity:Organization:kpmg llp", "title": "MENTIONS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "entity:Organization:kpmg international limited", "title": "MENTIONS", "to": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:ai engineering"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:multi-agent orchestration"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:rag"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:machine learning evaluation"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:langgraph"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:model context protocol (mcp)"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:azure openai"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "TAGGED_AS", "to": "tag:mlflow"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "MENTIONS", "to": "entity:Person:sarthak naitik kapaliya"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "MENTIONS", "to": "entity:Organization:zafin"}, {"from": "sha256:4f7c33c025c18d22552f069f26a7d5641b2923b3510d62883a445ed5642b431a", "title": "MENTIONS", "to": "entity:Location:toronto"}, {"from": "tag:ai engineering", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:ai engineering", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:rag", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:rag", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:langgraph", "title": "TAGGED_AS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "tag:langgraph", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:azure openai", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "entity:Person:sarthak naitik kapaliya", "title": "MENTIONS", "to": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b"}, {"from": "entity:Person:sarthak naitik kapaliya", "title": "MENTIONS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:relational model"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:data independence"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:database systems"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:n-ary relations"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:data integrity"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:relational algebra"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "TAGGED_AS", "to": "tag:database theory"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "MENTIONS", "to": "entity:Organization:ibm research laboratory"}, {"from": "sha256:fa2579f427a4da68466ef159a3ae0c3c1fe4eafec60f73c9f2f40378a65d8ef9", "title": "MENTIONS", "to": "entity:Person:e. f. codd"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:annual financial report"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:public finance"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:urban planning"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:housing development"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:climate action"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:infrastructure"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:credit rating"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "TAGGED_AS", "to": "tag:municipal government"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "MENTIONS", "to": "entity:Organization:s\u0026p global"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "MENTIONS", "to": "entity:Government:government of ontario"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "MENTIONS", "to": "entity:Government:federal government"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "MENTIONS", "to": "entity:Person:olivia chow"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "MENTIONS", "to": "entity:Person:paul johnson"}, {"from": "sha256:4feb00f15c5a6aeb17d26428f71d87b6f3949336b693484fff3a9213b8dd41ca", "title": "MENTIONS", "to": "entity:Organization:toronto community housing corporation"}, {"from": "tag:infrastructure", "title": "TAGGED_AS", "to": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93"}, {"from": "entity:Person:paul johnson", "title": "MENTIONS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "title": "TAGGED_AS", "to": "tag:trust funds"}, {"from": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "title": "TAGGED_AS", "to": "tag:asset management"}, {"from": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "title": "TAGGED_AS", "to": "tag:cash flow analysis"}, {"from": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "title": "TAGGED_AS", "to": "tag:annual report"}, {"from": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "title": "TAGGED_AS", "to": "tag:investment income"}, {"from": "sha256:e633d2290413d1020a0d80593ef9d551a31c18bd937b927bc5c49ad877f4e798", "title": "MENTIONS", "to": "entity:Organization:kpmg"}, {"from": "tag:asset management", "title": "TAGGED_AS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "tag:cash flow analysis", "title": "TAGGED_AS", "to": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957"}, {"from": "tag:cash flow analysis", "title": "TAGGED_AS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "tag:annual report", "title": "TAGGED_AS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "tag:investment income", "title": "TAGGED_AS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "entity:Organization:kpmg", "title": "MENTIONS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "title": "TAGGED_AS", "to": "tag:job monitoring"}, {"from": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "title": "TAGGED_AS", "to": "tag:container orchestration"}, {"from": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "title": "TAGGED_AS", "to": "tag:kubectl"}, {"from": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "title": "TAGGED_AS", "to": "tag:minikube"}, {"from": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "title": "TAGGED_AS", "to": "tag:log analysis"}, {"from": "sha256:f801ecc0a9de373aada2c048226fddb724031024b985e1ba098146d124fccb39", "title": "MENTIONS", "to": "entity:Tool:minikube"}, {"from": "tag:container orchestration", "title": "TAGGED_AS", "to": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93"}, {"from": "tag:container orchestration", "title": "TAGGED_AS", "to": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:public sector accounting"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:audit report"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:net debt"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:corporate finance"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:consolidated statement of operations"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:revenue"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:capital assets"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:remeasurement gains"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:government transfers"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "TAGGED_AS", "to": "tag:operating surplus"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "MENTIONS", "to": "entity:Person:jason li"}, {"from": "sha256:b1513ee800767b8023646ee7e29aea21609456e322b462df03fd60339da6c957", "title": "MENTIONS", "to": "entity:Person:stephen conforti"}, {"from": "tag:audit report", "title": "TAGGED_AS", "to": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "TAGGED_AS", "to": "tag:azure"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "TAGGED_AS", "to": "tag:aws"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "TAGGED_AS", "to": "tag:pytorch"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "TAGGED_AS", "to": "tag:cloud computing"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "MENTIONS", "to": "entity:Organization:buze platforms private limited"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "MENTIONS", "to": "entity:Education Institution:mcmaster university"}, {"from": "sha256:90e0cf23d7a8231c796e18d4b408f3bd742dbcdad9746821e39acd10379ec66b", "title": "MENTIONS", "to": "entity:Education Institution:pandit deendayal energy university"}, {"from": "tag:cloud computing", "title": "TAGGED_AS", "to": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93"}, {"from": "tag:cloud computing", "title": "TAGGED_AS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "tag:cloud computing", "title": "TAGGED_AS", "to": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd"}, {"from": "entity:Organization:buze platforms private limited", "title": "MENTIONS", "to": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251"}, {"from": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "title": "TAGGED_AS", "to": "tag:k8s"}, {"from": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "title": "TAGGED_AS", "to": "tag:distributed systems"}, {"from": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "title": "MENTIONS", "to": "entity:Software:kubernetes"}, {"from": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "title": "MENTIONS", "to": "entity:Organization:google"}, {"from": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "title": "MENTIONS", "to": "entity:System:borg"}, {"from": "sha256:f78717f305cf5e3998c01f54e4255781f1e8503515161f0c9c5ead152d26fa93", "title": "MENTIONS", "to": "entity:System:omega"}, {"from": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251", "title": "TAGGED_AS", "to": "tag:generative ai"}, {"from": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251", "title": "MENTIONS", "to": "entity:Organization:pandit deendayal energy university"}, {"from": "sha256:428e351f4ea1755fc8ebd50fe91256073c724658d380827c7ba2d8807408e251", "title": "MENTIONS", "to": "entity:Organization:anthropic"}, {"from": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139", "title": "TAGGED_AS", "to": "tag:canadian public sector accounting standards"}, {"from": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139", "title": "TAGGED_AS", "to": "tag:financial reporting"}, {"from": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139", "title": "TAGGED_AS", "to": "tag:internal controls"}, {"from": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139", "title": "TAGGED_AS", "to": "tag:audit opinion"}, {"from": "sha256:0eae3336e715486e7fdc6da4351725949038c4f8c91958a838ef2f0c226a3139", "title": "MENTIONS", "to": "entity:Organization:public sector accounting board of the chartered professional accountants of canada"}, {"from": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb", "title": "TAGGED_AS", "to": "tag:financial audit"}, {"from": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb", "title": "TAGGED_AS", "to": "tag:sinking funds"}, {"from": "sha256:ee4888e441cd00884d7d5b9a773915db33bc76f2c18cf58dee8ae117fb3dcafb", "title": "MENTIONS", "to": "entity:Organization:city of toronto sinking funds"}, {"from": "tag:sinking funds", "title": "TAGGED_AS", "to": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "TAGGED_AS", "to": "tag:hpa"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "TAGGED_AS", "to": "tag:vpa"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "TAGGED_AS", "to": "tag:autoscaling"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "TAGGED_AS", "to": "tag:metrics server"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "TAGGED_AS", "to": "tag:resource optimization"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "MENTIONS", "to": "entity:Feature:horizontal pod autoscaling (hpa)"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "MENTIONS", "to": "entity:Feature:vertical pod autoscaling (vpa)"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "MENTIONS", "to": "entity:Component:metrics server"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "MENTIONS", "to": "entity:Software:nginx"}, {"from": "sha256:06c1b5057bb8a1a76e853e9989c2b58ddeb9cf5dd90e8e49957043a9531885bd", "title": "MENTIONS", "to": "entity:Tool:stress-ng"}, {"from": "sha256:803b27d7c61ab28eeb3a2acde5ceec04fb6b51afe4e698d5301a76b425f2ce2e", "title": "TAGGED_AS", "to": "tag:actuarial requirements"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"forceAtlas2Based": {"gravitationalConstant": -100, "centralGravity": 0.01, "springLength": 100, "springConstant": 0.08}, "maxVelocity": 50, "solver": "forceAtlas2Based", "timestep": 0.35, "stabilization": {"iterations": 150}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+                    network.on("selectNode", neighbourhoodHighlight);
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

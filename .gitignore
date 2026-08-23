@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.egg-info/
+dist/
+build/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Semantic Organizer artifacts
+.semantic/
+.semantic_graph.json
+.semantic.md
+semantic_output/
+semantic_organizer.log
